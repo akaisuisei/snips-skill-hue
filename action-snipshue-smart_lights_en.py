@@ -2,6 +2,7 @@
 # -*-: coding utf-8 -*-
 
 from hermes_python.hermes import Hermes
+import paho.mqtt.client as mqtt
 from snipshue.snipshue import SnipsHue
 from snipshelpers.thread_handler import ThreadHandler
 from snipshelpers.config_parser import SnipsConfigParser
@@ -136,5 +137,20 @@ class Skill:
         else:
             self.snipshue.light_up(number, None)
 
+client = None
+pingTopic = 'concierge/apps/live/ping'
+pongTopic = 'concierge/apps/live/pong'
+
+def on_connect(client, userdata, flags, rc):
+    client.subscribe(pingTopic)
+
+def on_message(client, userdata, msg):
+    client.publish(pongTopic, '{"result":"snips-skill-hue"}')
+
 if __name__ == "__main__":
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(MQTT_IP_ADDR)
+    client.loop_start()
     Skill()
