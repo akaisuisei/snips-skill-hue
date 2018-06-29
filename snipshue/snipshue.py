@@ -135,6 +135,10 @@ class SnipsHue:
         lights = requests.get(self.lights_endpoint).json()
         return lights.keys()
 
+    def _get_all_lights_name(self):
+        lights = requests.get(self.lights_endpoint).json()
+        names = [(key, value.get("name")) for key, value in lights.iteritems()]
+        return  names
     def _get_light_ids_from_room(self, room):
         """ Returns the list of lights in a [room] or all light_ids if [room] is None """
 
@@ -149,7 +153,6 @@ class SnipsHue:
         """ Returns a dict {"room_name": {"light1", "light2"}, ...} after calling the Hue API """
         groups = requests.get(self.groups_endpoint).json()
         ids_from_room = {}
-
         for key, value in groups.iteritems():
             group = value
             if group.get("class") is not None:
