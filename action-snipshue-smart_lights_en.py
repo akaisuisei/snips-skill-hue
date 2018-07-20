@@ -1,10 +1,10 @@
 #!/usr/bin/env python2
 # -*-: coding utf-8 -*-
 
+from concierge_python.concierge import Concierge
 from hermes_python.hermes import Hermes
 from os.path import expanduser
 import  os
-import paho.mqtt.client as mqtt
 from snipshue.snipshue import SnipsHue
 from snipshelpers.thread_handler import ThreadHandler
 from snipshelpers.config_parser import SnipsConfigParser
@@ -19,6 +19,8 @@ MQTT_PORT = 1883
 MQTT_ADDR = "{}:{}".format(MQTT_IP_ADDR, str(MQTT_PORT))
 
 API_KEY = "api_key"
+_id = "snips-skill-hue"
+c = Concierge(MQTT_IP_ADDR)
 
 class Skill:
 
@@ -147,20 +149,13 @@ class Skill:
         else:
             self.snipshue.light_up(number, None)
 
-client = None
-pingTopic = 'concierge/apps/live/ping'
-pongTopic = 'concierge/apps/live/pong'
+def on_ping(client, userdata, msg):
+    c.publishPong(_id)
 
-def on_connect(client, userdata, flags, rc):
-    client.subscribe(pingTopic)
-
-def on_message(client, userdata, msg):
-    client.publish(pongTopic, '{"result":"snips-skill-hue"}')
+def on_view(client, userdata, msg):
+    pass
 
 if __name__ == "__main__":
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(MQTT_IP_ADDR)
-    client.loop_start()
+    c.subscribePing(on_ping)
+    c.subscribeView(_id, on_view)
     Skill()
