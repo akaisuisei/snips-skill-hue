@@ -149,10 +149,10 @@ class Skill:
         else:
             self.snipshue.light_up(number, None)
 
-def on_ping(client, userdata, msg):
+def on_ping(client):
     c.publishPong(_id)
 
-def on_view(client, userdata, msg):
+def on_view(client):
     pass
 
 if __name__ == "__main__":
